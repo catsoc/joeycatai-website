@@ -1,0 +1,84 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import BlogCard from '@/components/BlogCard.astro';
+import { getCollection } from 'astro:content';
+
+const allPosts = await getCollection('blog', ({ data }) => !data.draft);
+const sorted = allPosts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+
+// Collect all tags
+const allTags = [...new Set(sorted.flatMap((p) => p.data.tags))].sort();
+---
+
+<BaseLayout title="文章" description="技術筆記、開發心得與隨筆紀錄。">
+  <div class="container-base py-12">
+    <h1 class="text-4xl font-bold text-slate-900 dark:text-slate-100 mb-4">文章</h1>
+    <p class="text-slate-600 dark:text-slate-400 mb-8">
+      技術筆記、開發心得與隨筆紀錄。共 {sorted.length} 篇。
+    </p>
+
+    <!-- Tags filter -->
+    {allTags.length > 0 && (
+      <div class="flex flex-wrap gap-2 mb-10">
+        <button
+          class="tag cursor-pointer hover:bg-accent-200 dark:hover:bg-accent-800 transition-colors"
+          data-tag="all"
+        >
+          全部
+        </button>
+        {allTags.map((tag) => (
+          <button
+            class="tag cursor-pointer hover:bg-accent-200 dark:hover:bg-accent-800 transition-colors"
+            data-tag={tag}
+          >
+            {tag}
+          </button>
+        ))}
+      </div>
+    )}
+
+    <!-- Posts grid -->
+    {sorted.length === 0 ? (
+      <div class="text-center py-20 text-slate-500 dark:text-slate-400">
+        <p class="text-lg">尚無文章，敬請期待。</p>
+      </div>
+    ) : (
+      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6" id="posts-grid">
+        {sorted.map((post) => (
+          <div data-tags={post.data.tags.join(',')}>
+            <BlogCard
+              title={post.data.title}
+              description={post.data.description}
+              pubDate={post.data.pubDate}
+              slug={post.slug}
+              tags={post.data.tags}
+              heroImage={post.data.heroImage}
+            />
+          </div>
+        ))}
+      </div>
+    )}
+  </div>
+</BaseLayout>
+
+<script>
+  const buttons = document.querySelectorAll<HTMLButtonElement>('[data-tag]');
+  const posts = document.querySelectorAll<HTMLDivElement>('#posts-grid > div');
+
+  buttons.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const tag = btn.dataset.tag;
+      buttons.forEach((b) => b.classList.remove('bg-accent-200', 'dark:bg-accent-800'));
+      btn.classList.add('bg-accent-200', 'dark:bg-accent-800');
+
+      posts.forEach((post) => {
+        const tags = post.dataset.tags?.split(',') ?? [];
+        if (tag === 'all' || tags.includes(tag!)) {
+          post.style.display = '';
+        } else {
+          post.style.display = 'none';
+        }
+      });
+    });
+  });
+</script>
