@@ -1,0 +1,84 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --color-bg: 255 255 255;
+    --color-text: 15 23 42;
+    --color-muted: 100 116 139;
+    --color-border: 226 232 240;
+    --color-surface: 248 250 252;
+  }
+
+  .dark {
+    --color-bg: 15 23 42;
+    --color-text: 241 245 249;
+    --color-muted: 148 163 184;
+    --color-border: 51 65 85;
+    --color-surface: 30 41 59;
+  }
+
+  html {
+    @apply scroll-smooth;
+    background-color: rgb(var(--color-bg));
+    color: rgb(var(--color-text));
+  }
+
+  body {
+    @apply antialiased min-h-screen flex flex-col;
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+
+  ::selection {
+    @apply bg-accent-200 text-accent-900;
+  }
+
+  .dark ::selection {
+    @apply bg-accent-800 text-accent-100;
+  }
+}
+
+@layer components {
+  .container-base {
+    @apply max-w-4xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  .prose-custom {
+    @apply prose prose-slate dark:prose-invert max-w-none
+           prose-headings:font-semibold
+           prose-a:text-accent-600 dark:prose-a:text-accent-400
+           prose-code:text-accent-700 dark:prose-code:text-accent-300
+           prose-pre:bg-slate-900 dark:prose-pre:bg-slate-950;
+  }
+
+  .btn {
+    @apply inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium
+           transition-colors duration-200 focus-visible:outline-none
+           focus-visible:ring-2 focus-visible:ring-offset-2;
+  }
+
+  .btn-primary {
+    @apply btn bg-accent-600 text-white hover:bg-accent-700
+           focus-visible:ring-accent-500;
+  }
+
+  .btn-secondary {
+    @apply btn border border-slate-300 dark:border-slate-600
+           text-slate-700 dark:text-slate-300
+           hover:bg-slate-100 dark:hover:bg-slate-800
+           focus-visible:ring-slate-500;
+  }
+
+  .card {
+    @apply rounded-xl border border-slate-200 dark:border-slate-700
+           bg-white dark:bg-slate-800/50 p-6
+           transition-shadow duration-200 hover:shadow-md;
+  }
+
+  .tag {
+    @apply inline-block px-2.5 py-0.5 rounded-full text-xs font-medium
+           bg-accent-100 dark:bg-accent-900/40
+           text-accent-700 dark:text-accent-300;
+  }
+}

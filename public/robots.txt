@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://joeycatai.com/sitemap-index.xml

@@ -1,0 +1,43 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import ProjectCard from '@/components/ProjectCard.astro';
+import { getCollection } from 'astro:content';
+
+const allProjects = await getCollection('projects');
+const sorted = allProjects.sort((a, b) => {
+  // Featured first, then by date
+  if (a.data.featured !== b.data.featured) return a.data.featured ? -1 : 1;
+  return b.data.pubDate.valueOf() - a.data.pubDate.valueOf();
+});
+---
+
+<BaseLayout title="專案" description="我的開源專案與作品集。">
+  <div class="container-base py-12">
+    <h1 class="text-4xl font-bold text-slate-900 dark:text-slate-100 mb-4">專案</h1>
+    <p class="text-slate-600 dark:text-slate-400 mb-10">
+      開源專案、工具與作品集。共 {sorted.length} 個。
+    </p>
+
+    {sorted.length === 0 ? (
+      <div class="text-center py-20 text-slate-500 dark:text-slate-400">
+        <p class="text-lg">尚無專案，敬請期待。</p>
+      </div>
+    ) : (
+      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {sorted.map((project) => (
+          <ProjectCard
+            title={project.data.title}
+            description={project.data.description}
+            slug={project.slug}
+            tags={project.data.tags}
+            heroImage={project.data.heroImage}
+            github={project.data.github}
+            demo={project.data.demo}
+            status={project.data.status}
+            featured={project.data.featured}
+          />
+        ))}
+      </div>
+    )}
+  </div>
+</BaseLayout>

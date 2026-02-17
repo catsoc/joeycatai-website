@@ -1,0 +1,33 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+const allPosts = await getCollection('blog', ({ data }) => !data.draft);
+const allProjects = await getCollection('projects');
+
+const tagCount: Record<string, number> = {};
+for (const item of [...allPosts, ...allProjects]) {
+  for (const tag of item.data.tags) {
+    tagCount[tag] = (tagCount[tag] ?? 0) + 1;
+  }
+}
+
+const tags = Object.entries(tagCount).sort((a, b) => b[1] - a[1]);
+---
+
+<BaseLayout title="標籤" description="依標籤瀏覽所有文章與專案">
+  <section class="container-base py-12">
+    <h1 class="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-8">標籤</h1>
+    <div class="flex flex-wrap gap-3">
+      {tags.map(([tag, count]) => (
+        <a
+          href={`/tags/${tag.toLowerCase()}`}
+          class="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-accent-400 hover:text-accent-600 dark:hover:text-accent-400 transition-colors text-sm"
+        >
+          {tag}
+          <span class="text-xs text-slate-400 dark:text-slate-500">{count}</span>
+        </a>
+      ))}
+    </div>
+  </section>
+</BaseLayout>

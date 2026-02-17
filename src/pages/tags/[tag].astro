@@ -1,0 +1,88 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import BlogCard from '@/components/BlogCard.astro';
+import ProjectCard from '@/components/ProjectCard.astro';
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  const allPosts = await getCollection('blog', ({ data }) => !data.draft);
+  const allProjects = await getCollection('projects');
+
+  const allTags = new Set([
+    ...allPosts.flatMap((p) => p.data.tags.map((t) => t.toLowerCase())),
+    ...allProjects.flatMap((p) => p.data.tags.map((t) => t.toLowerCase())),
+  ]);
+
+  return Array.from(allTags).map((tag) => ({
+    params: { tag },
+    props: { tag },
+  }));
+}
+
+const { tag } = Astro.props;
+
+const allPosts = await getCollection('blog', ({ data }) =>
+  !data.draft && data.tags.some((t) => t.toLowerCase() === tag)
+);
+const allProjects = await getCollection('projects', ({ data }) =>
+  data.tags.some((t) => t.toLowerCase() === tag)
+);
+
+const posts = allPosts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+const projects = allProjects.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+const total = posts.length + projects.length;
+---
+
+<BaseLayout title={`#${tag}`} description={`所有標記為 ${tag} 的文章與專案，共 ${total} 筆`}>
+  <section class="container-base py-12">
+    <div class="mb-10">
+      <a
+        href="/tags"
+        class="text-sm text-slate-500 dark:text-slate-400 hover:text-accent-600 dark:hover:text-accent-400 transition-colors"
+      >
+        ← 所有標籤
+      </a>
+      <h1 class="text-3xl font-bold text-slate-900 dark:text-slate-100 mt-4">#{tag}</h1>
+      <p class="text-slate-500 dark:text-slate-400 mt-2">{total} 筆結果</p>
+    </div>
+
+    {posts.length > 0 && (
+      <div class="mb-12">
+        <h2 class="text-lg font-semibold text-slate-700 dark:text-slate-300 mb-6">文章</h2>
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {posts.map((post) => (
+            <BlogCard
+              title={post.data.title}
+              description={post.data.description}
+              pubDate={post.data.pubDate}
+              slug={post.slug}
+              tags={post.data.tags}
+              heroImage={post.data.heroImage}
+            />
+          ))}
+        </div>
+      </div>
+    )}
+
+    {projects.length > 0 && (
+      <div>
+        <h2 class="text-lg font-semibold text-slate-700 dark:text-slate-300 mb-6">專案</h2>
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {projects.map((project) => (
+            <ProjectCard
+              title={project.data.title}
+              description={project.data.description}
+              slug={project.slug}
+              tags={project.data.tags}
+              heroImage={project.data.heroImage}
+              github={project.data.github}
+              demo={project.data.demo}
+              status={project.data.status}
+              featured={project.data.featured}
+            />
+          ))}
+        </div>
+      </div>
+    )}
+  </section>
+</BaseLayout>

@@ -1,0 +1,94 @@
+---
+import '../styles/global.css';
+import Nav from '@/components/Nav.astro';
+import Footer from '@/components/Footer.astro';
+import SEO from '@/components/SEO.astro';
+import { SITE } from '@/site.config';
+
+export interface Props {
+  title: string;
+  description?: string;
+  image?: string;
+  article?: boolean;
+  pubDate?: Date;
+  updatedDate?: Date;
+  tags?: string[];
+  author?: string;
+  lang?: 'zh-TW' | 'en';
+}
+
+const {
+  title,
+  description,
+  image,
+  article = false,
+  pubDate,
+  updatedDate,
+  tags,
+  author,
+  lang = 'zh-TW',
+} = Astro.props;
+
+const websiteSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: SITE.name,
+  url: SITE.url,
+  description: SITE.description,
+};
+
+const personSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: SITE.author,
+  url: SITE.url,
+};
+---
+
+<!doctype html>
+<html lang={lang} class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <SEO
+      title={title}
+      description={description}
+      image={image}
+      article={article}
+      pubDate={pubDate}
+      updatedDate={updatedDate}
+      tags={tags}
+      author={author}
+    />
+    <script type="application/ld+json" set:html={JSON.stringify(websiteSchema)} />
+    <script type="application/ld+json" set:html={JSON.stringify(personSchema)} />
+    <slot name="head" />
+    <!-- Dark mode: prevent flash -->
+    <script is:inline>
+      const theme = (() => {
+        if (typeof localStorage !== 'undefined' && localStorage.getItem('theme')) {
+          return localStorage.getItem('theme');
+        }
+        if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+          return 'dark';
+        }
+        return 'light';
+      })();
+      document.documentElement.classList.toggle('dark', theme === 'dark');
+    </script>
+  </head>
+  <body class="flex flex-col min-h-screen bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100">
+    <Nav />
+    <main class="flex-1">
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>

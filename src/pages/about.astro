@@ -1,0 +1,107 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+
+const skills = {
+  '程式語言': ['TypeScript', 'Python', 'Go', 'Rust'],
+  '前端': ['Astro', 'React', 'Vue', 'Tailwind CSS'],
+  '後端': ['Node.js', 'FastAPI', 'PostgreSQL', 'Redis'],
+  '工具 & 平台': ['Git', 'Docker', 'Linux', 'Cloudflare'],
+};
+
+const timeline = [
+  { year: '2024', event: '建立個人網站，持續分享技術文章與開源專案' },
+  { year: '2023', event: '深入探索 AI / LLM 應用開發' },
+  { year: '2022', event: '參與多個開源專案，累積社群貢獻' },
+  { year: '2020', event: '開始軟體工程師職涯' },
+];
+---
+
+<BaseLayout title="關於我" description="了解更多關於 joeycatai 的背景、技能與經歷。">
+  <div class="container-base py-12">
+    <!-- Intro -->
+    <section class="mb-16">
+      <h1 class="text-4xl font-bold text-slate-900 dark:text-slate-100 mb-6">關於我</h1>
+      <div class="flex flex-col md:flex-row gap-10">
+        <div class="flex-1 space-y-4 text-slate-600 dark:text-slate-400 leading-relaxed">
+          <p>
+            嗨！我是 <strong class="text-slate-900 dark:text-slate-100">joeycatai</strong>，
+            一位對技術充滿熱情的軟體工程師。我喜歡透過寫作分享所學，
+            並透過開源專案回饋社群。
+          </p>
+          <p>
+            平時專注在 Web 開發、系統設計與 AI 應用，對工具鏈最佳化和開發者體驗有特別的興趣。
+            喜歡研究新技術，也享受從頭實作來深入理解底層原理的過程。
+          </p>
+          <p>
+            這個網站是我的數位花園——記錄技術筆記、專案進展與不定期的隨筆。
+          </p>
+          <div class="flex flex-wrap gap-3 pt-2">
+            <a href="/contact" class="btn-primary">聯繫我</a>
+            <a href="/blog" class="btn-secondary">閱讀文章</a>
+          </div>
+        </div>
+        <!-- Avatar placeholder -->
+        <div class="md:w-48 flex-shrink-0">
+          <div class="w-40 h-40 md:w-48 md:h-48 rounded-2xl bg-gradient-to-br from-accent-400 to-accent-600 flex items-center justify-center text-white text-5xl font-bold shadow-lg">
+            J
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Skills -->
+    <section class="mb-16">
+      <h2 class="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-6">技術棧</h2>
+      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        {Object.entries(skills).map(([category, items]) => (
+          <div class="card">
+            <h3 class="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3">
+              {category}
+            </h3>
+            <ul class="flex flex-wrap gap-2">
+              {items.map((skill) => (
+                <li class="tag">{skill}</li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- Timeline -->
+    <section class="mb-16">
+      <h2 class="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-6">經歷時間軸</h2>
+      <div class="relative pl-6 border-l-2 border-slate-200 dark:border-slate-700 space-y-8">
+        {timeline.map(({ year, event }) => (
+          <div class="relative">
+            <div class="absolute -left-[25px] w-3 h-3 rounded-full bg-accent-500 border-2 border-white dark:border-slate-900" />
+            <p class="text-sm font-mono text-accent-600 dark:text-accent-400 mb-1">{year}</p>
+            <p class="text-slate-700 dark:text-slate-300">{event}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- Currently -->
+    <section>
+      <h2 class="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-6">目前在做</h2>
+      <div class="grid sm:grid-cols-3 gap-6">
+        <div class="card">
+          <div class="text-2xl mb-3">📖</div>
+          <h3 class="font-semibold text-slate-900 dark:text-slate-100 mb-1">正在學習</h3>
+          <p class="text-sm text-slate-600 dark:text-slate-400">Rust 系統程式設計、LLM 應用架構</p>
+        </div>
+        <div class="card">
+          <div class="text-2xl mb-3">🛠</div>
+          <h3 class="font-semibold text-slate-900 dark:text-slate-100 mb-1">正在開發</h3>
+          <p class="text-sm text-slate-600 dark:text-slate-400">個人工具鏈與開源小工具</p>
+        </div>
+        <div class="card">
+          <div class="text-2xl mb-3">✍️</div>
+          <h3 class="font-semibold text-slate-900 dark:text-slate-100 mb-1">正在寫</h3>
+          <p class="text-sm text-slate-600 dark:text-slate-400">技術文章與踩坑紀錄</p>
+        </div>
+      </div>
+    </section>
+  </div>
+</BaseLayout>
