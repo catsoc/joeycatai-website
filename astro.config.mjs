@@ -11,4 +11,14 @@ export default defineConfig({
     tailwind({ applyBaseStyles: false }),
   ],
   output: 'static',
+  markdown: {
+    shikiConfig: {
+      // 亮色/深色模式各自套用對應主題
+      themes: {
+        light: 'github-light',
+        dark: 'github-dark',
+      },
+      wrap: true,
+    },
+  },
 });

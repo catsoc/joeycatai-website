@@ -1,6 +1,7 @@
 ---
 import BaseLayout from './BaseLayout.astro';
 import FormattedDate from '@/components/FormattedDate.astro';
+import { SITE } from '@/site.config';
 
 export interface Props {
   title: string;
@@ -13,9 +14,44 @@ export interface Props {
 }
 
 const { title, description, pubDate, updatedDate, heroImage, tags = [], lang = 'zh-TW' } = Astro.props;
+
+const canonicalURL = new URL(Astro.url.pathname, SITE.url);
+
+const articleSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: title,
+  description,
+  datePublished: pubDate.toISOString(),
+  ...(updatedDate && { dateModified: updatedDate.toISOString() }),
+  author: {
+    '@type': 'Person',
+    name: SITE.author,
+    url: SITE.url,
+  },
+  publisher: {
+    '@type': 'Person',
+    name: SITE.author,
+    url: SITE.url,
+  },
+  url: canonicalURL,
+  ...(heroImage && { image: heroImage.startsWith('http') ? heroImage : new URL(heroImage, SITE.url).toString() }),
+  keywords: tags.join(', '),
+};
 ---
 
-<BaseLayout title={title} description={description} image={heroImage} article pubDate={pubDate} lang={lang}>
+<BaseLayout
+  title={title}
+  description={description}
+  image={heroImage}
+  article
+  pubDate={pubDate}
+  updatedDate={updatedDate}
+  tags={tags}
+  lang={lang}
+>
+  <script type="application/ld+json" slot="head" set:html={JSON.stringify(articleSchema)} />
+
   <article class="container-base py-12">
     <!-- Back link -->
     <a
@@ -38,7 +74,11 @@ const { title, description, pubDate, updatedDate, heroImage, tags = [], lang = '
         />
       )}
       <div class="flex flex-wrap gap-2 mb-4">
-        {tags.map((tag) => <span class="tag">{tag}</span>)}
+        {tags.map((tag) => (
+          <a href={`/tags/${tag.toLowerCase()}`} class="tag hover:opacity-80 transition-opacity">
+            {tag}
+          </a>
+        ))}
       </div>
       <h1 class="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-slate-100 mb-4">
         {title}

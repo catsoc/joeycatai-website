@@ -1,48 +1,69 @@
 ---
+import { SITE } from '@/site.config';
+
 export interface Props {
   title: string;
   description?: string;
   image?: string;
   article?: boolean;
   pubDate?: Date;
+  updatedDate?: Date;
+  tags?: string[];
+  author?: string;
 }
 
 const {
   title,
-  description = '個人官方網站',
-  image = '/og-default.png',
+  description = SITE.description,
+  image = SITE.ogImage,
   article = false,
   pubDate,
+  updatedDate,
+  tags = [],
+  author = SITE.author,
 } = Astro.props;
 
-const siteUrl = 'https://joeycatai.com';
-const canonicalURL = new URL(Astro.url.pathname, siteUrl);
-const ogImage = image?.startsWith('http') ? image : new URL(image, siteUrl);
-const fullTitle = title.includes('joeycatai') ? title : `${title} · joeycatai`;
+const canonicalURL = new URL(Astro.url.pathname, SITE.url);
+const ogImage = image?.startsWith('http') ? image : new URL(image, SITE.url);
+const fullTitle = title.includes(SITE.name) ? title : `${title} · ${SITE.name}`;
 ---
 
 <!-- Primary -->
 <title>{fullTitle}</title>
 <meta name="description" content={description} />
+<meta name="author" content={author} />
 <link rel="canonical" href={canonicalURL} />
 
-<!-- Open Graph -->
+<!-- Open Graph（Facebook、Instagram、Threads 共用） -->
 <meta property="og:type" content={article ? 'article' : 'website'} />
 <meta property="og:url" content={canonicalURL} />
 <meta property="og:title" content={fullTitle} />
 <meta property="og:description" content={description} />
 <meta property="og:image" content={ogImage} />
-<meta property="og:site_name" content="joeycatai" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:type" content="image/png" />
+<meta property="og:image:alt" content={fullTitle} />
+<meta property="og:site_name" content={SITE.name} />
 <meta property="og:locale" content="zh_TW" />
-{article && pubDate && (
-  <meta property="article:published_time" content={pubDate.toISOString()} />
+
+<!-- Article 專屬 Open Graph -->
+{article && (
+  <>
+    {pubDate && <meta property="article:published_time" content={pubDate.toISOString()} />}
+    {updatedDate && <meta property="article:modified_time" content={updatedDate.toISOString()} />}
+    <meta property="article:author" content={author} />
+    {tags.map((tag) => <meta property="article:tag" content={tag} />)}
+  </>
 )}
 
 <!-- Twitter / X -->
 <meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:site" content={SITE.twitterHandle} />
+<meta name="twitter:creator" content={SITE.twitterHandle} />
 <meta name="twitter:title" content={fullTitle} />
 <meta name="twitter:description" content={description} />
 <meta name="twitter:image" content={ogImage} />
 
 <!-- Feed -->
-<link rel="alternate" type="application/rss+xml" title="joeycatai Blog" href="/rss.xml" />
+<link rel="alternate" type="application/rss+xml" title={`${SITE.name} Blog`} href="/rss.xml" />
