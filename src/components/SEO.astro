@@ -15,7 +15,7 @@ export interface Props {
 const {
   title,
   description = SITE.description,
-  image = SITE.ogImage,
+  image,
   article = false,
   pubDate,
   updatedDate,
@@ -24,8 +24,16 @@ const {
 } = Astro.props;
 
 const canonicalURL = new URL(Astro.url.pathname, SITE.url);
-const ogImage = image?.startsWith('http') ? image : new URL(image, SITE.url);
 const fullTitle = title.includes(SITE.name) ? title : `${title} · ${SITE.name}`;
+
+// OG 圖：傳入 image 優先，否則自動從 pathname 對應 /og/[route].png
+function resolveOgImage(): URL {
+  if (image?.startsWith('http')) return new URL(image);
+  if (image) return new URL(image, SITE.url);
+  const cleanPath = Astro.url.pathname.replace(/^\/|\/$/g, '') || 'default';
+  return new URL(`/og/${cleanPath}.png`, SITE.url);
+}
+const ogImage = resolveOgImage();
 ---
 
 <!-- Primary -->

@@ -1,18 +1,9 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
-import { getCollection } from 'astro:content';
+import { getAllTags } from '@/utils/content';
 
-const allPosts = await getCollection('blog', ({ data }) => !data.draft);
-const allProjects = await getCollection('projects');
-
-const tagCount: Record<string, number> = {};
-for (const item of [...allPosts, ...allProjects]) {
-  for (const tag of item.data.tags) {
-    tagCount[tag] = (tagCount[tag] ?? 0) + 1;
-  }
-}
-
-const tags = Object.entries(tagCount).sort((a, b) => b[1] - a[1]);
+const tagMap = await getAllTags();
+const tags = [...tagMap.entries()].sort((a, b) => b[1] - a[1]);
 ---
 
 <BaseLayout title="標籤" description="依標籤瀏覽所有文章與專案">

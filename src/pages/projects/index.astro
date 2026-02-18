@@ -1,14 +1,9 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import ProjectCard from '@/components/ProjectCard.astro';
-import { getCollection } from 'astro:content';
+import { getSortedProjects } from '@/utils/content';
 
-const allProjects = await getCollection('projects');
-const sorted = allProjects.sort((a, b) => {
-  // Featured first, then by date
-  if (a.data.featured !== b.data.featured) return a.data.featured ? -1 : 1;
-  return b.data.pubDate.valueOf() - a.data.pubDate.valueOf();
-});
+const sorted = await getSortedProjects();
 ---
 
 <BaseLayout title="專案" description="我的開源專案與作品集。">

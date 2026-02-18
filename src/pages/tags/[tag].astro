@@ -2,34 +2,23 @@
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import BlogCard from '@/components/BlogCard.astro';
 import ProjectCard from '@/components/ProjectCard.astro';
-import { getCollection } from 'astro:content';
+import { getAllTags, getSortedPosts, getSortedProjects } from '@/utils/content';
 
 export async function getStaticPaths() {
-  const allPosts = await getCollection('blog', ({ data }) => !data.draft);
-  const allProjects = await getCollection('projects');
-
-  const allTags = new Set([
-    ...allPosts.flatMap((p) => p.data.tags.map((t) => t.toLowerCase())),
-    ...allProjects.flatMap((p) => p.data.tags.map((t) => t.toLowerCase())),
-  ]);
-
-  return Array.from(allTags).map((tag) => ({
-    params: { tag },
-    props: { tag },
+  const tagMap = await getAllTags();
+  return [...tagMap.keys()].map((tag) => ({
+    params: { tag: tag.toLowerCase() },
+    props: { tag: tag.toLowerCase() },
   }));
 }
 
 const { tag } = Astro.props;
 
-const allPosts = await getCollection('blog', ({ data }) =>
-  !data.draft && data.tags.some((t) => t.toLowerCase() === tag)
-);
-const allProjects = await getCollection('projects', ({ data }) =>
-  data.tags.some((t) => t.toLowerCase() === tag)
-);
+const allPosts = await getSortedPosts();
+const allProjects = await getSortedProjects();
 
-const posts = allPosts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
-const projects = allProjects.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+const posts = allPosts.filter((p) => p.data.tags.some((t) => t.toLowerCase() === tag));
+const projects = allProjects.filter((p) => p.data.tags.some((t) => t.toLowerCase() === tag));
 const total = posts.length + projects.length;
 ---
 
