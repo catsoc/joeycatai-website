@@ -70,6 +70,23 @@ const personSchema = {
     <script type="application/ld+json" set:html={JSON.stringify(websiteSchema)} />
     <script type="application/ld+json" set:html={JSON.stringify(personSchema)} />
     <slot name="head" />
+
+    <!-- Google Analytics 4（僅在 SITE.gaId 設定時載入） -->
+    {SITE.gaId && (
+      <Fragment set:html={`
+        <script async src="https://www.googletagmanager.com/gtag/js?id=${SITE.gaId}"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', '${SITE.gaId}', {
+            page_path: window.location.pathname,
+            anonymize_ip: true
+          });
+        </script>
+      `} />
+    )}
+
     <!-- Dark mode: prevent flash -->
     <script is:inline>
       const theme = (() => {
