@@ -16,10 +16,11 @@ const allTags = [...new Set(sorted.flatMap((p) => p.data.tags))].sort();
 
     <!-- Tags filter -->
     {allTags.length > 0 && (
-      <div class="flex flex-wrap gap-2 mb-10">
+      <div class="flex flex-wrap gap-2 mb-10" role="group" aria-label="依標籤篩選文章">
         <button
           class="tag cursor-pointer hover:bg-accent-200 dark:hover:bg-accent-800 transition-colors"
           data-tag="all"
+          aria-pressed="true"
         >
           全部
         </button>
@@ -27,6 +28,7 @@ const allTags = [...new Set(sorted.flatMap((p) => p.data.tags))].sort();
           <button
             class="tag cursor-pointer hover:bg-accent-200 dark:hover:bg-accent-800 transition-colors"
             data-tag={tag}
+            aria-pressed="false"
           >
             {tag}
           </button>
@@ -65,15 +67,22 @@ const allTags = [...new Set(sorted.flatMap((p) => p.data.tags))].sort();
   buttons.forEach((btn) => {
     btn.addEventListener('click', () => {
       const tag = btn.dataset.tag;
-      buttons.forEach((b) => b.classList.remove('bg-accent-200', 'dark:bg-accent-800'));
-      btn.classList.add('bg-accent-200', 'dark:bg-accent-800');
 
+      // 更新 active 樣式與 aria-pressed
+      buttons.forEach((b) => {
+        b.classList.remove('bg-accent-200', 'dark:bg-accent-800');
+        b.setAttribute('aria-pressed', 'false');
+      });
+      btn.classList.add('bg-accent-200', 'dark:bg-accent-800');
+      btn.setAttribute('aria-pressed', 'true');
+
+      // 用 class 控制顯示（避免 inline style 與 CSS class 的 specificity 衝突）
       posts.forEach((post) => {
-        const tags = post.dataset.tags?.split(',') ?? [];
-        if (tag === 'all' || tags.includes(tag!)) {
-          post.style.display = '';
+        const postTags = post.dataset.tags?.split(',') ?? [];
+        if (tag === 'all' || postTags.includes(tag!)) {
+          post.classList.remove('hidden');
         } else {
-          post.style.display = 'none';
+          post.classList.add('hidden');
         }
       });
     });

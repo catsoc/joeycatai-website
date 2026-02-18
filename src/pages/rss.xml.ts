@@ -4,11 +4,14 @@ import { getSortedPosts } from '@/utils/content';
 import { SITE } from '@/site.config';
 
 export async function GET(context: APIContext) {
+  if (!context.site) {
+    return new Response('astro.config.mjs 未設定 site URL', { status: 500 });
+  }
   const posts = await getSortedPosts();
   return rss({
     title: `${SITE.name} · 文章`,
     description: SITE.description,
-    site: context.site!,
+    site: context.site,
     items: posts.map((post) => ({
       title: post.data.title,
       description: post.data.description,
