@@ -1,0 +1,149 @@
+---
+const items = ['要快', '要好', '要便宜'] as const;
+---
+
+<section class="mb-16">
+  <h2 class="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-2">合作守則</h2>
+  <p class="text-sm text-slate-500 dark:text-slate-400 mb-8">
+    三個只能同時成立兩個，試試看
+  </p>
+  <div class="flex flex-col gap-6">
+    {items.map((label, i) => (
+      <label class="flex items-center justify-end gap-6 w-fit cursor-pointer select-none">
+        <span class="text-2xl text-slate-700 dark:text-slate-300 font-medium">{label}</span>
+        <button
+          class="paw-toggle"
+          data-index={String(i)}
+          aria-label={label}
+          aria-pressed="false"
+          type="button"
+        >
+          <!-- Cat paw SVG：4 趾墊 + 1 掌墊 -->
+          <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" class="paw-svg" aria-hidden="true">
+            <ellipse cx="28" cy="27" rx="11" ry="14" />
+            <ellipse cx="72" cy="27" rx="11" ry="14" />
+            <ellipse cx="16" cy="53" rx="10" ry="13" />
+            <ellipse cx="84" cy="53" rx="10" ry="13" />
+            <ellipse cx="50" cy="74" rx="26" ry="19" />
+          </svg>
+        </button>
+      </label>
+    ))}
+  </div>
+</section>
+
+<style>
+  .paw-toggle {
+    /* 顏色由 JS 動態設定 */
+    --fur: #7ddaea;
+    --pad: #000000;
+    --size: 3.5rem;
+
+    width: var(--size);
+    height: var(--size);
+    border-radius: 9999px;
+    background-color: var(--fur);
+    border: 2px solid transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.55rem;
+    flex-shrink: 0;
+
+    /* OFF 狀態：半透明 */
+    opacity: 0.3;
+    filter: grayscale(0.4);
+
+    box-shadow: 0 2px 8px rgb(0 0 0 / 0.12);
+    transition:
+      opacity 0.2s ease,
+      filter 0.2s ease,
+      transform 0.15s ease,
+      box-shadow 0.25s ease,
+      background-color 0.35s ease,
+      border-color 0.25s ease;
+  }
+
+  .paw-toggle.is-on {
+    opacity: 1;
+    filter: none;
+    transform: scale(1.08);
+    border-color: rgb(0 0 0 / 0.12);
+    box-shadow:
+      0 0 0 3px var(--fur),
+      0 4px 16px rgb(0 0 0 / 0.18);
+  }
+
+  .paw-toggle:active {
+    transform: scale(0.9) !important;
+  }
+
+  .paw-svg {
+    width: 100%;
+    height: 100%;
+    fill: var(--pad);
+    transition: fill 0.35s ease;
+  }
+</style>
+
+<script>
+  const COLOR_LIST = [
+    { fur: '#7DDAEA', pad: '#000000' },
+    { fur: '#FAFAFA', pad: '#FFA5A5' },
+    { fur: '#DFC57B', pad: '#000000' },
+    { fur: '#8D6F64', pad: '#FFA5A5' },
+    { fur: '#444444', pad: '#FFA5A5' },
+    { fur: '#F3F2F2', pad: '#000000' },
+  ];
+
+  function initProactiveToggles() {
+    const buttons = document.querySelectorAll<HTMLButtonElement>('.paw-toggle');
+    if (!buttons.length) return;
+
+    let colorIndex = 0;
+    const states = [false, false, false];
+
+    function applyColors() {
+      const c = COLOR_LIST[colorIndex];
+      buttons.forEach((btn) => {
+        btn.style.setProperty('--fur', c.fur);
+        btn.style.setProperty('--pad', c.pad);
+      });
+    }
+
+    function updateUI() {
+      buttons.forEach((btn, i) => {
+        btn.classList.toggle('is-on', states[i]);
+        btn.setAttribute('aria-pressed', String(states[i]));
+      });
+    }
+
+    applyColors();
+    updateUI();
+
+    buttons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const clickedIndex = Number(btn.dataset.index);
+        states[clickedIndex] = !states[clickedIndex];
+        updateUI();
+
+        // 三個全開：隨機關掉其中一個（不是剛按的那個）並換色
+        if (states.every((v) => v)) {
+          const candidates = states.reduce<number[]>((acc, _v, i) => {
+            if (i !== clickedIndex) acc.push(i);
+            return acc;
+          }, []);
+          const target = candidates[Math.floor(Math.random() * candidates.length)];
+          states[target] = false;
+          colorIndex = (colorIndex + 1) % COLOR_LIST.length;
+          applyColors();
+          updateUI();
+        }
+      });
+    });
+  }
+
+  // astro:page-load：相容 ViewTransitions，每次換頁後重新初始化
+  document.addEventListener('astro:page-load', initProactiveToggles);
+</script>

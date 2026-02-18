@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
+import ProactiveToggles from '@/components/ProactiveToggles.astro';
 
 const skills = {
   '程式語言': ['TypeScript', 'Python', 'Go', 'Rust'],
@@ -81,6 +82,9 @@ const timeline = [
         ))}
       </div>
     </section>
+
+    <!-- Proactive Toggles -->
+    <ProactiveToggles />
 
     <!-- Currently -->
     <section>
