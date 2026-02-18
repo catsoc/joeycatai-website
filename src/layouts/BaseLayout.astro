@@ -3,6 +3,7 @@ import '../styles/global.css';
 import Nav from '@/components/Nav.astro';
 import Footer from '@/components/Footer.astro';
 import SEO from '@/components/SEO.astro';
+import { ViewTransitions } from 'astro:transitions';
 import { SITE } from '@/site.config';
 
 export interface Props {
@@ -69,6 +70,7 @@ const personSchema = {
     />
     <script type="application/ld+json" set:html={JSON.stringify(websiteSchema)} />
     <script type="application/ld+json" set:html={JSON.stringify(personSchema)} />
+    <ViewTransitions />
     <slot name="head" />
 
     <!-- Google Analytics 4（僅在 SITE.gaId 設定時載入） -->
@@ -79,9 +81,9 @@ const personSchema = {
           window.dataLayer = window.dataLayer || [];
           function gtag(){dataLayer.push(arguments);}
           gtag('js', new Date());
-          gtag('config', '${SITE.gaId}', {
-            page_path: window.location.pathname,
-            anonymize_ip: true
+          gtag('config', '${SITE.gaId}', { anonymize_ip: true });
+          document.addEventListener('astro:page-load', () => {
+            gtag('event', 'page_view', { page_path: window.location.pathname });
           });
         </script>
       `} />

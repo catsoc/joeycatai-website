@@ -4,7 +4,6 @@ export const SITE = {
   description: '軟體工程師 · 開源愛好者 · 分享技術、專案與思考',
   author: 'joeycatai',
   twitterHandle: '@joeycatai',
-  ogImage: '/og-default.png',
 
   /**
    * Google Analytics 4 Measurement ID

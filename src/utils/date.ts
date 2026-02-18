@@ -16,3 +16,13 @@ export function formatDate(date: Date, locale: Intl.LocalesArgument = 'zh-TW'): 
 export function isoDate(date: Date): string {
   return date.toISOString();
 }
+
+/**
+ * 估算閱讀時間（分鐘），以中文 300字/分鐘、英文 200詞/分鐘混合計算
+ */
+export function getReadingTime(text: string): number {
+  const cjkChars = (text.match(/[\u4e00-\u9fff\u3400-\u4dbf\uf900-\ufaff]/g) ?? []).length;
+  const words = (text.replace(/[\u4e00-\u9fff\u3400-\u4dbf\uf900-\ufaff]/g, '').match(/\S+/g) ?? []).length;
+  const minutes = cjkChars / 300 + words / 200;
+  return Math.max(1, Math.round(minutes));
+}

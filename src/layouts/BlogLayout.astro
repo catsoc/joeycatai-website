@@ -11,9 +11,10 @@ export interface Props {
   heroImage?: string;
   tags?: string[];
   lang?: 'zh-TW' | 'en';
+  readingTime?: number;
 }
 
-const { title, description, pubDate, updatedDate, heroImage, tags = [], lang = 'zh-TW' } = Astro.props;
+const { title, description, pubDate, updatedDate, heroImage, tags = [], lang = 'zh-TW', readingTime } = Astro.props;
 
 const canonicalURL = new URL(Astro.url.pathname, SITE.url);
 
@@ -86,6 +87,12 @@ const articleSchema = {
       <p class="text-lg text-slate-600 dark:text-slate-400 mb-4">{description}</p>
       <div class="flex items-center gap-3 text-sm text-slate-500 dark:text-slate-500">
         <FormattedDate date={pubDate} />
+        {readingTime && (
+          <>
+            <span>·</span>
+            <span>{readingTime} 分鐘閱讀</span>
+          </>
+        )}
         {updatedDate && (
           <>
             <span>·</span>
@@ -103,3 +110,29 @@ const articleSchema = {
     </div>
   </article>
 </BaseLayout>
+
+<script>
+  function attachCopyButtons() {
+    document.querySelectorAll('pre.astro-code:not([data-copy-attached])').forEach((pre) => {
+      pre.setAttribute('data-copy-attached', '');
+      const wrapper = document.createElement('div');
+      wrapper.className = 'code-block-wrapper';
+      pre.parentNode?.insertBefore(wrapper, pre);
+      wrapper.appendChild(pre);
+
+      const btn = document.createElement('button');
+      btn.className = 'copy-btn';
+      btn.textContent = '複製';
+      btn.addEventListener('click', async () => {
+        const code = pre.querySelector('code')?.innerText ?? pre.innerText;
+        await navigator.clipboard.writeText(code);
+        btn.textContent = '已複製！';
+        setTimeout(() => { btn.textContent = '複製'; }, 2000);
+      });
+      wrapper.appendChild(btn);
+    });
+  }
+
+  attachCopyButtons();
+  document.addEventListener('astro:page-load', attachCopyButtons);
+</script>
