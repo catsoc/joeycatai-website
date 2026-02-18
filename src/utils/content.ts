@@ -21,7 +21,7 @@ export async function getSortedProjects() {
 
 /**
  * 回傳所有 tag 及其出現次數（合併 blog + projects）
- * Map key 保留原始大小寫，比對時請自行 toLowerCase()
+ * Map key 統一小寫，避免 "TypeScript" 與 "typescript" 產生重複路由
  */
 export async function getAllTags(): Promise<Map<string, number>> {
   const [posts, projects] = await Promise.all([
@@ -32,7 +32,8 @@ export async function getAllTags(): Promise<Map<string, number>> {
   const tagCount = new Map<string, number>();
   for (const item of [...posts, ...projects]) {
     for (const tag of item.data.tags) {
-      tagCount.set(tag, (tagCount.get(tag) ?? 0) + 1);
+      const key = tag.toLowerCase();
+      tagCount.set(key, (tagCount.get(key) ?? 0) + 1);
     }
   }
   return tagCount;

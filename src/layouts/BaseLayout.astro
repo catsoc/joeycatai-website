@@ -67,9 +67,14 @@ const personSchema = {
       updatedDate={updatedDate}
       tags={tags}
       author={author}
+      lang={lang}
     />
-    <script type="application/ld+json" set:html={JSON.stringify(websiteSchema)} />
-    <script type="application/ld+json" set:html={JSON.stringify(personSchema)} />
+    {!article && (
+      <>
+        <script type="application/ld+json" set:html={JSON.stringify(websiteSchema)} />
+        <script type="application/ld+json" set:html={JSON.stringify(personSchema)} />
+      </>
+    )}
     <ViewTransitions />
     <slot name="head" />
 
@@ -89,18 +94,15 @@ const personSchema = {
       `} />
     )}
 
-    <!-- Dark mode: prevent flash -->
+    <!-- Dark mode: 初次載入防閃爍 + ViewTransitions swap 後重新套用 -->
     <script is:inline>
-      const theme = (() => {
-        if (typeof localStorage !== 'undefined' && localStorage.getItem('theme')) {
-          return localStorage.getItem('theme');
-        }
-        if (window.matchMedia?.('(prefers-color-scheme: dark)').matches) {
-          return 'dark';
-        }
-        return 'light';
-      })();
-      document.documentElement.classList.toggle('dark', theme === 'dark');
+      function applyTheme() {
+        const t = localStorage.getItem('theme') ??
+          (window.matchMedia?.('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.classList.toggle('dark', t === 'dark');
+      }
+      applyTheme();
+      document.addEventListener('astro:after-swap', applyTheme);
     </script>
   </head>
   <body class="flex flex-col min-h-screen bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100">

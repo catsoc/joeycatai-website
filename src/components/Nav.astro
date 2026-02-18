@@ -95,19 +95,22 @@ const isActive = (href: string) =>
 </header>
 
 <script>
-  // Theme toggle
-  const btn = document.getElementById('theme-toggle');
-  btn?.addEventListener('click', () => {
-    const isDark = document.documentElement.classList.toggle('dark');
-    localStorage.setItem('theme', isDark ? 'dark' : 'light');
-  });
+  // 用 astro:page-load 包裝，確保 ViewTransitions 換頁後事件監聽器仍有效
+  function setupNav() {
+    document.getElementById('theme-toggle')?.addEventListener('click', () => {
+      const isDark = document.documentElement.classList.toggle('dark');
+      localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    });
 
-  // Mobile menu — 同步更新 aria-expanded 讓螢幕閱讀器知道選單狀態
-  const mobileBtn = document.getElementById('mobile-menu-btn');
-  const mobileMenu = document.getElementById('mobile-menu');
-  mobileBtn?.addEventListener('click', () => {
-    const isOpen = mobileMenu?.classList.toggle('hidden') === false;
-    mobileBtn.setAttribute('aria-expanded', String(isOpen));
-    mobileBtn.setAttribute('aria-label', isOpen ? '關閉選單' : '開啟選單');
-  });
+    // Mobile menu — 同步更新 aria-expanded 讓螢幕閱讀器知道選單狀態
+    const mobileBtn = document.getElementById('mobile-menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    mobileBtn?.addEventListener('click', () => {
+      const isOpen = mobileMenu?.classList.toggle('hidden') === false;
+      mobileBtn.setAttribute('aria-expanded', String(isOpen));
+      mobileBtn.setAttribute('aria-label', isOpen ? '關閉選單' : '開啟選單');
+    });
+  }
+
+  document.addEventListener('astro:page-load', setupNav);
 </script>

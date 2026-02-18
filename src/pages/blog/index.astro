@@ -61,30 +61,35 @@ const allTags = [...new Set(sorted.flatMap((p) => p.data.tags))].sort();
 </BaseLayout>
 
 <script>
-  const buttons = document.querySelectorAll<HTMLButtonElement>('[data-tag]');
-  const posts = document.querySelectorAll<HTMLDivElement>('#posts-grid > div');
+  // 用 astro:page-load 包裝，確保 ViewTransitions 換頁後事件監聽器仍有效
+  function setupTagFilter() {
+    const buttons = document.querySelectorAll<HTMLButtonElement>('[data-tag]');
+    const posts = document.querySelectorAll<HTMLDivElement>('#posts-grid > div');
 
-  buttons.forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const tag = btn.dataset.tag;
+    buttons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const tag = btn.dataset.tag;
 
-      // 更新 active 樣式與 aria-pressed
-      buttons.forEach((b) => {
-        b.classList.remove('bg-accent-200', 'dark:bg-accent-800');
-        b.setAttribute('aria-pressed', 'false');
-      });
-      btn.classList.add('bg-accent-200', 'dark:bg-accent-800');
-      btn.setAttribute('aria-pressed', 'true');
+        // 更新 active 樣式與 aria-pressed
+        buttons.forEach((b) => {
+          b.classList.remove('bg-accent-200', 'dark:bg-accent-800');
+          b.setAttribute('aria-pressed', 'false');
+        });
+        btn.classList.add('bg-accent-200', 'dark:bg-accent-800');
+        btn.setAttribute('aria-pressed', 'true');
 
-      // 用 class 控制顯示（避免 inline style 與 CSS class 的 specificity 衝突）
-      posts.forEach((post) => {
-        const postTags = post.dataset.tags?.split(',') ?? [];
-        if (tag === 'all' || postTags.includes(tag!)) {
-          post.classList.remove('hidden');
-        } else {
-          post.classList.add('hidden');
-        }
+        // 用 class 控制顯示（避免 inline style 與 CSS class 的 specificity 衝突）
+        posts.forEach((post) => {
+          const postTags = post.dataset.tags?.split(',') ?? [];
+          if (tag === 'all' || postTags.includes(tag!)) {
+            post.classList.remove('hidden');
+          } else {
+            post.classList.add('hidden');
+          }
+        });
       });
     });
-  });
+  }
+
+  document.addEventListener('astro:page-load', setupTagFilter);
 </script>

@@ -1,24 +1,33 @@
 ---
+import type { CollectionEntry } from 'astro:content';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import BlogCard from '@/components/BlogCard.astro';
 import ProjectCard from '@/components/ProjectCard.astro';
 import { getAllTags, getSortedPosts, getSortedProjects } from '@/utils/content';
 
 export async function getStaticPaths() {
-  const tagMap = await getAllTags();
+  const [tagMap, allPosts, allProjects] = await Promise.all([
+    getAllTags(),
+    getSortedPosts(),
+    getSortedProjects(),
+  ]);
   return [...tagMap.keys()].map((tag) => ({
-    params: { tag: tag.toLowerCase() },
-    props: { tag: tag.toLowerCase() },
+    params: { tag },
+    props: {
+      tag,
+      posts: allPosts.filter((p) => p.data.tags.some((t) => t.toLowerCase() === tag)),
+      projects: allProjects.filter((p) => p.data.tags.some((t) => t.toLowerCase() === tag)),
+    },
   }));
 }
 
-const { tag } = Astro.props;
+type Props = {
+  tag: string;
+  posts: CollectionEntry<'blog'>[];
+  projects: CollectionEntry<'projects'>[];
+};
 
-const allPosts = await getSortedPosts();
-const allProjects = await getSortedProjects();
-
-const posts = allPosts.filter((p) => p.data.tags.some((t) => t.toLowerCase() === tag));
-const projects = allProjects.filter((p) => p.data.tags.some((t) => t.toLowerCase() === tag));
+const { tag, posts, projects } = Astro.props;
 const total = posts.length + projects.length;
 ---
 

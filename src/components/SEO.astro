@@ -10,6 +10,7 @@ export interface Props {
   updatedDate?: Date;
   tags?: string[];
   author?: string;
+  lang?: 'zh-TW' | 'en';
 }
 
 const {
@@ -21,7 +22,10 @@ const {
   updatedDate,
   tags = [],
   author = SITE.author,
+  lang = 'zh-TW',
 } = Astro.props;
+
+const ogLocale = lang === 'en' ? 'en_US' : 'zh_TW';
 
 const canonicalURL = new URL(Astro.url.pathname, SITE.url);
 const fullTitle = title.includes(SITE.name) ? title : `${title} · ${SITE.name}`;
@@ -53,7 +57,7 @@ const ogImage = resolveOgImage();
 <meta property="og:image:type" content="image/png" />
 <meta property="og:image:alt" content={fullTitle} />
 <meta property="og:site_name" content={SITE.name} />
-<meta property="og:locale" content="zh_TW" />
+<meta property="og:locale" content={ogLocale} />
 
 <!-- Article 專屬 Open Graph -->
 {article && (
