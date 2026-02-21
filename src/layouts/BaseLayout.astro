@@ -72,19 +72,11 @@ const personSchema = {
     <slot name="head" />
     <!-- Dark mode: prevent flash -->
     <script is:inline>
-      const theme = (() => {
-        if (typeof localStorage !== 'undefined' && localStorage.getItem('theme')) {
-          return localStorage.getItem('theme');
-        }
-        if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-          return 'dark';
-        }
-        return 'light';
-      })();
-      document.documentElement.classList.toggle('dark', theme === 'dark');
+      const t = localStorage.getItem('theme') ?? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.documentElement.classList.toggle('dark', t === 'dark');
     </script>
   </head>
-  <body class="flex flex-col min-h-screen bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100">
+  <body>
     <Nav />
     <main class="flex-1">
       <slot />
