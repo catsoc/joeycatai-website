@@ -15,7 +15,7 @@ export interface Props {
 
 const { title, description, pubDate, updatedDate, heroImage, tags = [], lang = 'zh-TW' } = Astro.props;
 
-const canonicalURL = new URL(Astro.url.pathname, SITE.url);
+const creator = { '@type': 'Person', name: SITE.author, url: SITE.url };
 
 const articleSchema = {
   '@context': 'https://schema.org',
@@ -24,17 +24,9 @@ const articleSchema = {
   description,
   datePublished: pubDate.toISOString(),
   ...(updatedDate && { dateModified: updatedDate.toISOString() }),
-  author: {
-    '@type': 'Person',
-    name: SITE.author,
-    url: SITE.url,
-  },
-  publisher: {
-    '@type': 'Person',
-    name: SITE.author,
-    url: SITE.url,
-  },
-  url: canonicalURL,
+  author: creator,
+  publisher: creator,
+  url: new URL(Astro.url.pathname, SITE.url),
   ...(heroImage && { image: heroImage.startsWith('http') ? heroImage : new URL(heroImage, SITE.url).toString() }),
   keywords: tags.join(', '),
 };

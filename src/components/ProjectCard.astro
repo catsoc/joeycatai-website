@@ -1,4 +1,6 @@
 ---
+import StatusBadge from './StatusBadge.astro';
+
 export interface Props {
   title: string;
   description: string;
@@ -12,13 +14,6 @@ export interface Props {
 }
 
 const { title, description, slug, tags = [], heroImage, github, demo, status = 'completed', featured = false } = Astro.props;
-
-const statusLabel = { active: '進行中', completed: '已完成', archived: '已封存' }[status];
-const statusColor = {
-  active: 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300',
-  completed: 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300',
-  archived: 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400',
-}[status];
 ---
 
 <div class={`card group flex flex-col gap-4 ${featured ? 'ring-1 ring-accent-200 dark:ring-accent-800' : ''}`}>
@@ -34,9 +29,7 @@ const statusColor = {
   )}
   <div class="flex flex-col gap-2 flex-1">
     <div class="flex flex-wrap items-center gap-1.5">
-      <span class={`inline-block px-2.5 py-0.5 rounded-full text-xs font-medium ${statusColor}`}>
-        {statusLabel}
-      </span>
+      <StatusBadge status={status} />
       {featured && (
         <span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">
           精選
