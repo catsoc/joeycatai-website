@@ -59,6 +59,8 @@ const linkClass = (href: string, extra = '') =>
       <button
         id="mobile-menu-btn"
         aria-label="開啟選單"
+        aria-expanded="false"
+        aria-controls="mobile-menu"
         class="md:hidden p-2 rounded-lg text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
       >
         <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -92,6 +94,8 @@ const linkClass = (href: string, extra = '') =>
   const mobileBtn = document.getElementById('mobile-menu-btn');
   const mobileMenu = document.getElementById('mobile-menu');
   mobileBtn?.addEventListener('click', () => {
+    const isExpanded = mobileBtn.getAttribute('aria-expanded') === 'true';
+    mobileBtn.setAttribute('aria-expanded', String(!isExpanded));
     mobileMenu?.classList.toggle('hidden');
   });
 </script>

@@ -5,22 +5,30 @@ export interface Props {
   title: string;
   description?: string;
   image?: string;
+  imageWidth?: number;
+  imageHeight?: number;
+  imageType?: string;
   article?: boolean;
   pubDate?: Date;
   updatedDate?: Date;
   tags?: string[];
   author?: string;
+  robots?: string;
 }
 
 const {
   title,
   description = SITE.description,
   image,
+  imageWidth,
+  imageHeight,
+  imageType,
   article = false,
   pubDate,
   updatedDate,
   tags = [],
   author = SITE.author,
+  robots = 'index,follow',
 } = Astro.props;
 
 const canonicalURL = new URL(Astro.url.pathname, SITE.url);
@@ -32,6 +40,7 @@ const fullTitle = title.includes(SITE.name) ? title : `${title} · ${SITE.name}`
 <title>{fullTitle}</title>
 <meta name="description" content={description} />
 <meta name="author" content={author} />
+<meta name="robots" content={robots} />
 <link rel="canonical" href={canonicalURL} />
 
 <!-- Open Graph（Facebook、Instagram、Threads 共用） -->
@@ -41,6 +50,9 @@ const fullTitle = title.includes(SITE.name) ? title : `${title} · ${SITE.name}`
 <meta property="og:description" content={description} />
 {ogImage && <meta property="og:image" content={String(ogImage)} />}
 {ogImage && <meta property="og:image:alt" content={fullTitle} />}
+{imageWidth && <meta property="og:image:width" content={String(imageWidth)} />}
+{imageHeight && <meta property="og:image:height" content={String(imageHeight)} />}
+{imageType && <meta property="og:image:type" content={imageType} />}
 <meta property="og:site_name" content={SITE.name} />
 <meta property="og:locale" content="zh_TW" />
 

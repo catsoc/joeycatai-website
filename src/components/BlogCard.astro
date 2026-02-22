@@ -1,4 +1,6 @@
 ---
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
 import FormattedDate from './FormattedDate.astro';
 
 export interface Props {
@@ -7,7 +9,7 @@ export interface Props {
   pubDate: Date;
   slug: string;
   tags?: string[];
-  heroImage?: string;
+  heroImage?: ImageMetadata;
 }
 
 const { title, description, pubDate, slug, tags = [], heroImage } = Astro.props;
@@ -18,7 +20,7 @@ const { title, description, pubDate, slug, tags = [], heroImage } = Astro.props;
   class="card group flex flex-col gap-4 hover:border-accent-300 dark:hover:border-accent-700 transition-all duration-200"
 >
   {heroImage && (
-    <img
+    <Image
       src={heroImage}
       alt={title}
       class="w-full aspect-video object-cover rounded-lg"

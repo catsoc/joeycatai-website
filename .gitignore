@@ -24,3 +24,10 @@ pnpm-debug.log*
 
 # editor
 .vscode/extensions.json
+
+# npm cache
+.npm-cache/
+
+# claude code
+reports/
+.claude/

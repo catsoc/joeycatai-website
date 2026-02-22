@@ -1,13 +1,12 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import BlogCard from '@/components/BlogCard.astro';
-import { getCollection } from 'astro:content';
+import { getPublishedPosts } from '@/lib/content';
 
-const allPosts = await getCollection('blog', ({ data }) => !data.draft);
-const sorted = allPosts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+const sorted = await getPublishedPosts();
 
 // Collect all tags
-const allTags = [...new Set(sorted.flatMap((p) => p.data.tags))].sort();
+const allTags = [...new Set(sorted.flatMap((post) => post.data.tags.map((t) => t.toLowerCase())))].sort();
 ---
 
 <BaseLayout title="文章" description="技術筆記、開發心得與隨筆紀錄。">
@@ -23,6 +22,7 @@ const allTags = [...new Set(sorted.flatMap((p) => p.data.tags))].sort();
         <button
           class="tag cursor-pointer hover:bg-accent-200 dark:hover:bg-accent-800 transition-colors"
           data-tag="all"
+          aria-pressed="true"
         >
           全部
         </button>
@@ -30,6 +30,7 @@ const allTags = [...new Set(sorted.flatMap((p) => p.data.tags))].sort();
           <button
             class="tag cursor-pointer hover:bg-accent-200 dark:hover:bg-accent-800 transition-colors"
             data-tag={tag}
+            aria-pressed="false"
           >
             {tag}
           </button>
@@ -45,12 +46,12 @@ const allTags = [...new Set(sorted.flatMap((p) => p.data.tags))].sort();
     ) : (
       <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6" id="posts-grid">
         {sorted.map((post) => (
-          <div data-tags={post.data.tags.join(',')}>
+          <div data-tags={post.data.tags.map((t) => t.toLowerCase()).join(',')}>
             <BlogCard
               title={post.data.title}
               description={post.data.description}
               pubDate={post.data.pubDate}
-              slug={post.slug}
+              slug={post.id}
               tags={post.data.tags}
               heroImage={post.data.heroImage}
             />
@@ -68,8 +69,12 @@ const allTags = [...new Set(sorted.flatMap((p) => p.data.tags))].sort();
   buttons.forEach((btn) => {
     btn.addEventListener('click', () => {
       const tag = btn.dataset.tag;
-      buttons.forEach((b) => b.classList.remove('bg-accent-200', 'dark:bg-accent-800'));
+      buttons.forEach((b) => {
+        b.classList.remove('bg-accent-200', 'dark:bg-accent-800');
+        b.setAttribute('aria-pressed', 'false');
+      });
       btn.classList.add('bg-accent-200', 'dark:bg-accent-800');
+      btn.setAttribute('aria-pressed', 'true');
 
       posts.forEach((post) => {
         const tags = post.dataset.tags?.split(',') ?? [];

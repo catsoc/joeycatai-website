@@ -1,4 +1,6 @@
 ---
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
 import StatusBadge from './StatusBadge.astro';
 
 export interface Props {
@@ -6,7 +8,7 @@ export interface Props {
   description: string;
   slug: string;
   tags?: string[];
-  heroImage?: string;
+  heroImage?: ImageMetadata;
   github?: string;
   demo?: string;
   status?: 'active' | 'completed' | 'archived';
@@ -19,7 +21,7 @@ const { title, description, slug, tags = [], heroImage, github, demo, status = '
 <div class={`card group flex flex-col gap-4 ${featured ? 'ring-1 ring-accent-200 dark:ring-accent-800' : ''}`}>
   {heroImage && (
     <a href={`/projects/${slug}`}>
-      <img
+      <Image
         src={heroImage}
         alt={title}
         class="w-full aspect-video object-cover rounded-lg"

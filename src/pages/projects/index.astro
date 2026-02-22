@@ -1,11 +1,9 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import ProjectCard from '@/components/ProjectCard.astro';
-import { getCollection } from 'astro:content';
+import { getProjects } from '@/lib/content';
 
-const allProjects = await getCollection('projects');
-const sorted = allProjects.sort((a, b) => {
-  // Featured first, then by date
+const sorted = (await getProjects()).sort((a, b) => {
   if (a.data.featured !== b.data.featured) return a.data.featured ? -1 : 1;
   return b.data.pubDate.valueOf() - a.data.pubDate.valueOf();
 });
@@ -28,7 +26,7 @@ const sorted = allProjects.sort((a, b) => {
           <ProjectCard
             title={project.data.title}
             description={project.data.description}
-            slug={project.slug}
+            slug={project.id}
             tags={project.data.tags}
             heroImage={project.data.heroImage}
             github={project.data.github}

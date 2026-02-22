@@ -1,13 +1,16 @@
 ---
+import { Image, getImage } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
 import BaseLayout from './BaseLayout.astro';
 import FormattedDate from '@/components/FormattedDate.astro';
 import StatusBadge from '@/components/StatusBadge.astro';
+import { SITE } from '@/site.config';
 
 export interface Props {
   title: string;
   description: string;
   pubDate: Date;
-  heroImage?: string;
+  heroImage?: ImageMetadata;
   tags?: string[];
   github?: string;
   demo?: string;
@@ -15,9 +18,30 @@ export interface Props {
 }
 
 const { title, description, pubDate, heroImage, tags = [], github, demo, status = 'completed' } = Astro.props;
+
+const resolvedHero = heroImage ? await getImage({ src: heroImage }) : undefined;
+
+const projectSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'CreativeWork',
+  name: title,
+  description,
+  datePublished: pubDate.toISOString(),
+  creator: { '@type': 'Person', name: SITE.author, url: SITE.url },
+  url: new URL(Astro.url.pathname, SITE.url),
+};
 ---
 
-<BaseLayout title={title} description={description} image={heroImage}>
+<BaseLayout
+  title={title}
+  description={description}
+  image={resolvedHero?.src}
+  imageWidth={heroImage?.width}
+  imageHeight={heroImage?.height}
+  imageType={heroImage ? `image/${heroImage.format}` : undefined}
+>
+  <script type="application/ld+json" slot="head" set:html={JSON.stringify(projectSchema)} />
+
   <article class="container-base py-12">
     <a
       href="/projects"
@@ -31,7 +55,7 @@ const { title, description, pubDate, heroImage, tags = [], github, demo, status 
 
     <header class="mb-8">
       {heroImage && (
-        <img
+        <Image
           src={heroImage}
           alt={title}
           class="w-full aspect-[2/1] object-cover rounded-xl mb-8 shadow-md"

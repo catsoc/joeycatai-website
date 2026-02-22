@@ -9,24 +9,32 @@ export interface Props {
   title: string;
   description?: string;
   image?: string;
+  imageWidth?: number;
+  imageHeight?: number;
+  imageType?: string;
   article?: boolean;
   pubDate?: Date;
   updatedDate?: Date;
   tags?: string[];
   author?: string;
   lang?: 'zh-TW' | 'en';
+  robots?: string;
 }
 
 const {
   title,
   description,
   image,
+  imageWidth,
+  imageHeight,
+  imageType,
   article = false,
   pubDate,
   updatedDate,
   tags,
   author,
   lang = 'zh-TW',
+  robots,
 } = Astro.props;
 
 const websiteSchema = {
@@ -61,11 +69,15 @@ const personSchema = {
       title={title}
       description={description}
       image={image}
+      imageWidth={imageWidth}
+      imageHeight={imageHeight}
+      imageType={imageType}
       article={article}
       pubDate={pubDate}
       updatedDate={updatedDate}
       tags={tags}
       author={author}
+      robots={robots}
     />
     <script type="application/ld+json" set:html={JSON.stringify(websiteSchema)} />
     <script type="application/ld+json" set:html={JSON.stringify(personSchema)} />

@@ -2,18 +2,12 @@
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import BlogCard from '@/components/BlogCard.astro';
 import ProjectCard from '@/components/ProjectCard.astro';
-import { getCollection } from 'astro:content';
+import { getFeaturedProjects, getRecentPosts } from '@/lib/content';
 
-const allPosts = await getCollection('blog', ({ data }) => !data.draft);
-const recentPosts = allPosts
-  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
-  .slice(0, 3);
-
-const allProjects = await getCollection('projects');
-const featuredProjects = allProjects
-  .filter((p) => p.data.featured)
-  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
-  .slice(0, 3);
+const [featuredProjects, recentPosts] = await Promise.all([
+  getFeaturedProjects(3),
+  getRecentPosts(3),
+]);
 ---
 
 <BaseLayout title="joeycatai · 個人官方網站" description="嗨，我是 joeycatai，這裡是我的個人網站，分享技術文章、專案與想法。">
@@ -48,7 +42,7 @@ const featuredProjects = allProjects
           <ProjectCard
             title={project.data.title}
             description={project.data.description}
-            slug={project.slug}
+            slug={project.id}
             tags={project.data.tags}
             heroImage={project.data.heroImage}
             github={project.data.github}
@@ -76,7 +70,7 @@ const featuredProjects = allProjects
             title={post.data.title}
             description={post.data.description}
             pubDate={post.data.pubDate}
-            slug={post.slug}
+            slug={post.id}
             tags={post.data.tags}
             heroImage={post.data.heroImage}
           />
