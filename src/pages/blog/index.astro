@@ -2,11 +2,14 @@
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import BlogCard from '@/components/BlogCard.astro';
 import { getPublishedPosts } from '@/lib/content';
+import { toTagSlug } from '@/lib/tags';
 
 const sorted = await getPublishedPosts();
 
-// Collect all tags
-const allTags = [...new Set(sorted.flatMap((post) => post.data.tags.map((t) => t.toLowerCase())))].sort();
+// Collect all tags: [slug, display]
+const allTags = [...new Map(
+  sorted.flatMap((post) => post.data.tags.map((t) => [toTagSlug(t), t] as const)),
+).entries()].sort((a, b) => a[0].localeCompare(b[0]));
 ---
 
 <BaseLayout title="文章" description="技術筆記、開發心得與隨筆紀錄。">
@@ -26,13 +29,13 @@ const allTags = [...new Set(sorted.flatMap((post) => post.data.tags.map((t) => t
         >
           全部
         </button>
-        {allTags.map((tag) => (
+        {allTags.map(([slug, display]) => (
           <button
             class="tag cursor-pointer hover:bg-accent-200 dark:hover:bg-accent-800 transition-colors"
-            data-tag={tag}
+            data-tag={slug}
             aria-pressed="false"
           >
-            {tag}
+            {display}
           </button>
         ))}
       </div>
@@ -46,7 +49,7 @@ const allTags = [...new Set(sorted.flatMap((post) => post.data.tags.map((t) => t
     ) : (
       <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6" id="posts-grid">
         {sorted.map((post) => (
-          <div data-tags={post.data.tags.map((t) => t.toLowerCase()).join(',')}>
+          <div data-tags={post.data.tags.map((t) => toTagSlug(t)).join(',')}>
             <BlogCard
               title={post.data.title}
               description={post.data.description}

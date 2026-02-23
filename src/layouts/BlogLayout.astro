@@ -4,6 +4,7 @@ import type { ImageMetadata } from 'astro';
 import BaseLayout from './BaseLayout.astro';
 import FormattedDate from '@/components/FormattedDate.astro';
 import { SITE } from '@/site.config';
+import { toTagSlug } from '@/lib/tags';
 
 export interface Props {
   title: string;
@@ -74,7 +75,7 @@ const articleSchema = {
       )}
       <div class="flex flex-wrap gap-2 mb-4">
         {tags.map((tag) => (
-          <a href={`/tags/${tag.toLowerCase()}`} class="tag hover:opacity-80 transition-opacity">
+          <a href={`/tags/${toTagSlug(tag)}`} class="tag hover:opacity-80 transition-opacity">
             {tag}
           </a>
         ))}

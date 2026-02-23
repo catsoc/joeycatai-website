@@ -5,6 +5,7 @@ import tailwind from '@astrojs/tailwind';
 
 export default defineConfig({
   site: 'https://joeycatai.com',
+  trailingSlash: 'never',
   integrations: [
     mdx(),
     sitemap(),

@@ -1,4 +1,5 @@
 import { getCollection, type CollectionEntry } from 'astro:content';
+import { toTagSlug, buildTagMap } from './tags';
 
 type BlogEntry = CollectionEntry<'blog'>;
 type ProjectEntry = CollectionEntry<'projects'>;
@@ -8,14 +9,22 @@ type TaggedEntry = { data: { tags: string[] } };
 const sortByPubDateDesc = <T extends DatedEntry>(items: T[]) =>
   [...items].sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 
-const hasTag = (item: TaggedEntry, tag: string) =>
-  item.data.tags.some((itemTag) => itemTag.toLowerCase() === tag);
+const hasTag = (item: TaggedEntry, targetSlug: string) =>
+  item.data.tags.some((tag) => toTagSlug(tag) === targetSlug);
 
 export const getPublishedPosts = async (): Promise<BlogEntry[]> =>
   sortByPubDateDesc(await getCollection('blog', ({ data }) => !data.draft));
 
 export const getProjects = async (): Promise<ProjectEntry[]> =>
   sortByPubDateDesc(await getCollection('projects'));
+
+export async function getProjectsSorted(): Promise<ProjectEntry[]> {
+  const projects = await getCollection('projects');
+  return [...projects].sort((a, b) => {
+    if (a.data.featured !== b.data.featured) return a.data.featured ? -1 : 1;
+    return b.data.pubDate.valueOf() - a.data.pubDate.valueOf();
+  });
+}
 
 export async function getRecentPosts(limit?: number): Promise<BlogEntry[]> {
   const posts = await getPublishedPosts();
@@ -27,33 +36,20 @@ export async function getFeaturedProjects(limit?: number): Promise<ProjectEntry[
   return limit === undefined ? featuredProjects : featuredProjects.slice(0, limit);
 }
 
-async function getTagBuckets(): Promise<Record<string, number>> {
+export async function getTagIndex(): Promise<Array<{ slug: string; display: string; count: number }>> {
   const [posts, projects] = await Promise.all([getPublishedPosts(), getProjects()]);
-  const buckets: Record<string, number> = {};
-
-  for (const entry of [...posts, ...projects]) {
-    for (const tag of entry.data.tags) {
-      const key = tag.toLowerCase();
-      buckets[key] = (buckets[key] ?? 0) + 1;
-    }
-  }
-
-  return buckets;
-}
-
-export async function getTagIndex(): Promise<Array<[string, number]>> {
-  const buckets = await getTagBuckets();
-  return Object.entries(buckets).sort((a, b) => b[1] - a[1]);
+  const tagMap = buildTagMap([...posts, ...projects]);
+  return [...tagMap.entries()]
+    .map(([slug, info]) => ({ slug, display: info.display, count: info.count }))
+    .sort((a, b) => b.count - a.count);
 }
 
 export async function getItemsByTag(
-  tag: string
+  slug: string,
 ): Promise<{ posts: BlogEntry[]; projects: ProjectEntry[] }> {
-  const targetTag = tag.toLowerCase();
   const [posts, projects] = await Promise.all([getPublishedPosts(), getProjects()]);
-
   return {
-    posts: posts.filter((post) => hasTag(post, targetTag)),
-    projects: projects.filter((project) => hasTag(project, targetTag)),
+    posts: posts.filter((post) => hasTag(post, slug)),
+    projects: projects.filter((project) => hasTag(project, slug)),
   };
 }

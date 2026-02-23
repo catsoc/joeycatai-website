@@ -6,18 +6,18 @@ import { getTagIndex, getItemsByTag } from '@/lib/content';
 
 export async function getStaticPaths() {
   const tags = await getTagIndex();
-  return tags.map(([tag]) => ({
-    params: { tag },
-    props: { tag },
+  return tags.map(({ slug, display }) => ({
+    params: { tag: slug },
+    props: { slug, display },
   }));
 }
 
-const { tag } = Astro.props;
-const { posts, projects } = await getItemsByTag(tag);
+const { slug, display } = Astro.props;
+const { posts, projects } = await getItemsByTag(slug);
 const total = posts.length + projects.length;
 ---
 
-<BaseLayout title={`#${tag}`} description={`所有標記為 ${tag} 的文章與專案，共 ${total} 筆`} robots="noindex,follow">
+<BaseLayout title={`#${display}`} description={`所有標記為 ${display} 的文章與專案，共 ${total} 筆`} robots="noindex,follow">
   <section class="container-base py-12">
     <div class="mb-10">
       <a
@@ -26,7 +26,7 @@ const total = posts.length + projects.length;
       >
         ← 所有標籤
       </a>
-      <h1 class="text-3xl font-bold text-slate-900 dark:text-slate-100 mt-4">#{tag}</h1>
+      <h1 class="text-3xl font-bold text-slate-900 dark:text-slate-100 mt-4">#{display}</h1>
       <p class="text-slate-500 dark:text-slate-400 mt-2">{total} 筆結果</p>
     </div>
 

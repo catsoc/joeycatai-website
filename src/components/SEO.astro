@@ -14,6 +14,7 @@ export interface Props {
   tags?: string[];
   author?: string;
   robots?: string;
+  lang?: 'zh-TW' | 'en';
 }
 
 const {
@@ -29,10 +30,23 @@ const {
   tags = [],
   author = SITE.author,
   robots = 'index,follow',
+  lang = 'zh-TW',
 } = Astro.props;
 
 const canonicalURL = new URL(Astro.url.pathname, SITE.url);
-const ogImage = image && (image.startsWith('http') ? image : new URL(image, SITE.url));
+
+const localeMap: Record<string, string> = { 'zh-TW': 'zh_TW', en: 'en_US' };
+const ogLocale = localeMap[lang] ?? 'zh_TW';
+
+const isDefaultImage = !image;
+const resolvedImage = image ?? '/og-default.png';
+const ogImage = resolvedImage.startsWith('http')
+  ? resolvedImage
+  : new URL(resolvedImage, SITE.url).toString();
+const ogWidth = isDefaultImage ? 1200 : imageWidth;
+const ogHeight = isDefaultImage ? 630 : imageHeight;
+const ogType = isDefaultImage ? 'image/png' : imageType;
+
 const fullTitle = title.includes(SITE.name) ? title : `${title} · ${SITE.name}`;
 ---
 
@@ -48,13 +62,13 @@ const fullTitle = title.includes(SITE.name) ? title : `${title} · ${SITE.name}`
 <meta property="og:url" content={canonicalURL} />
 <meta property="og:title" content={fullTitle} />
 <meta property="og:description" content={description} />
-{ogImage && <meta property="og:image" content={String(ogImage)} />}
-{ogImage && <meta property="og:image:alt" content={fullTitle} />}
-{imageWidth && <meta property="og:image:width" content={String(imageWidth)} />}
-{imageHeight && <meta property="og:image:height" content={String(imageHeight)} />}
-{imageType && <meta property="og:image:type" content={imageType} />}
+<meta property="og:image" content={ogImage} />
+<meta property="og:image:alt" content={fullTitle} />
+{ogWidth && <meta property="og:image:width" content={String(ogWidth)} />}
+{ogHeight && <meta property="og:image:height" content={String(ogHeight)} />}
+{ogType && <meta property="og:image:type" content={ogType} />}
 <meta property="og:site_name" content={SITE.name} />
-<meta property="og:locale" content="zh_TW" />
+<meta property="og:locale" content={ogLocale} />
 
 <!-- Article 專屬 Open Graph -->
 {article && (
@@ -67,12 +81,12 @@ const fullTitle = title.includes(SITE.name) ? title : `${title} · ${SITE.name}`
 )}
 
 <!-- Twitter / X -->
-<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:card" content={image ? 'summary_large_image' : 'summary'} />
 <meta name="twitter:site" content={SITE.twitterHandle} />
 <meta name="twitter:creator" content={SITE.twitterHandle} />
 <meta name="twitter:title" content={fullTitle} />
 <meta name="twitter:description" content={description} />
-{ogImage && <meta name="twitter:image" content={String(ogImage)} />}
+<meta name="twitter:image" content={ogImage} />
 
 <!-- Feed -->
 <link rel="alternate" type="application/rss+xml" title={`${SITE.name} Blog`} href="/rss.xml" />
