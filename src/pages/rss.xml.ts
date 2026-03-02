@@ -1,12 +1,13 @@
 import rss from '@astrojs/rss';
 import { getPublishedPosts } from '@/lib/content';
+import { SITE } from '@/site.config';
 import type { APIContext } from 'astro';
 
 export async function GET(context: APIContext) {
   const posts = await getPublishedPosts();
   return rss({
-    title: 'joeycatai · 文章',
-    description: '技術筆記、開發心得與隨筆紀錄',
+    title: `${SITE.name} · 文章`,
+    description: SITE.description,
     site: context.site!,
     items: posts.map((post) => ({
       title: post.data.title,

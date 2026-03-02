@@ -1,4 +1,6 @@
 ---
+import { SITE } from '@/site.config';
+
 const navLinks = [
   { href: '/', label: '首頁' },
   { href: '/about', label: '關於我' },
@@ -25,7 +27,7 @@ const linkClass = (href: string, extra = '') =>
       href="/"
       class="font-semibold text-lg text-slate-900 dark:text-slate-100 hover:text-accent-600 dark:hover:text-accent-400 transition-colors"
     >
-      joeycatai
+      {SITE.name}
     </a>
 
     <!-- Desktop links -->
